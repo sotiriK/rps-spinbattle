@@ -2,7 +2,7 @@ import Component from "../Abstracts/Component";
 import IGoContainer from "../Interfaces/IGoContainer";
 import IRenderer from "../Interfaces/IRenderer";
 
-// display the slot machine
+// display a slot machine reel
 export default class CompReel extends Component {
     // constants
     private readonly _minSpinFrames: number = 180;
@@ -16,9 +16,7 @@ export default class CompReel extends Component {
     private readonly _maskId: string;
     private readonly _symbolData: Map<string, string>;
     private readonly _reelData: Array<string>;
-    private readonly _mask: IGoContainer;
     private readonly _symbols: Array<IGoContainer>;
-    private _endCallback?: () => void;
     private _endingSpin: boolean;
     private _spinVelocity: number;
     private _spinFrames: number;
@@ -27,6 +25,7 @@ export default class CompReel extends Component {
     private _visibleSymbols: number;
     private _maskWidth: number;
     private _maskHeight: number;
+    private _endCallback?: () => void;
     
     // public properties
     public get IsSpinning(): boolean { 
@@ -57,7 +56,7 @@ export default class CompReel extends Component {
         this._endCallback = undefined;
         
         this._visibleSymbols = Math.ceil(height / width);
-        this._mask = this.Renderer.StageMask(this._maskId, 0, 0, width, height);
+        this.Renderer.StageMask(this._maskId, 0, 0, width, height);
         
         this.PopulateSymbols();
         this.PlaceSymbols(this._stopIndex);

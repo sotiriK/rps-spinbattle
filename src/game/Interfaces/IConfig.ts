@@ -7,6 +7,7 @@ export default interface IConfig {
     readonly MinHeightLandscape: number;
     readonly MinWidthPortrait: number;
     readonly MinHeightPortrait: number;
+    readonly PortraitScaleFactor: number;
     readonly BalanceStart: number;
     readonly BetMin: number;
     readonly BetMax: number;

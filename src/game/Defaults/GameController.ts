@@ -66,21 +66,26 @@ export default class GameController implements IGameController {
     }
 
     public Resize(): void {
-        const wwidth = window.innerWidth;
-        const wheight = window.innerHeight;
-        const portrait = wwidth < wheight;
-        let cwidth;
-        let cheight;
-        if (!portrait) {
-            cwidth = wwidth < this.Config.MinWidthLandscape ? this.Config.MinWidthLandscape : wwidth;
-            cheight = wheight < this.Config.MinHeightLandscape ? this.Config.MinHeightLandscape : wheight;
+        const wwidth: number = window.innerWidth;
+        const wheight: number = window.innerHeight;
+        const portrait: boolean = wwidth < wheight;
+
+        let minW: number, minH: number, sFactor: number;
+        if (portrait) {
+            minW = this.Config.MinWidthPortrait;
+            minH = this.Config.MinHeightPortrait;
+            sFactor = this.Config.PortraitScaleFactor;
         }
         else {
-            cwidth = wwidth < this.Config.MinWidthPortrait ? this.Config.MinWidthPortrait : wwidth;
-            cheight = wheight < this.Config.MinHeightPortrait ? this.Config.MinHeightPortrait : wheight;
+            minW = this.Config.MinWidthLandscape;
+            minH = this.Config.MinHeightLandscape;
+            sFactor = 1.0;
         }
-        const scaleX = cwidth / this.Config.ReferenceWidth;
-        const scaleY = cheight / this.Config.ReferenceHeight;
+
+        const cwidth = wwidth < minW ? minW : wwidth;
+        const cheight = wheight < minH ? minH : wheight;
+        const scaleX = (cwidth / this.Config.ReferenceWidth) * sFactor;
+        const scaleY = (cheight / this.Config.ReferenceHeight) * sFactor;
 
         const objs: Array<Manager | undefined> = [this._background, this._menuView, this._slotView, this._infoView];
         for (const obj of objs) {

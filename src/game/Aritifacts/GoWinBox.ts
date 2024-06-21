@@ -30,7 +30,7 @@ export default class GoWinBox extends GameObject {
 
         this._fillAlpha = fillAlpha;
         this._flash = flash;
-        this._fill = this.Renderer.StageRectangle(this._id + this._fillId, size, size, fillColor, this._fillAlpha);
+        this._fill = this.Renderer.StageRectangle(this.GetFillId(), size, size, fillColor, this._fillAlpha);
         
         const lineAlpha: number = this._fillAlpha * this._lineAlphaMultiplier;
         this._container = this.Renderer.StageFrame(this._id, size, size, lineSize, lineColor, lineAlpha > 1 ? 1 : lineAlpha);
@@ -75,8 +75,13 @@ export default class GoWinBox extends GameObject {
     public Dispose(): void {
         super.Dispose();
         if (this._fill) {
-            this.Renderer.Remove(this._id + this._fillId);
+            this.Renderer.Remove(this.GetFillId());
             this._fill = undefined;
         }
+    }
+
+    // helpers
+    private GetFillId() {
+        return this._id + this._fillId;
     }
 }

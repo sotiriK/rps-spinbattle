@@ -8,7 +8,7 @@ import GoPanel from "./GoPanel";
 import GoImage from "./GoImage";
 import Manager from "../Abstracts/Manager";
 
-// display slot graphics
+// display slot game graphics
 export default class ViewGame extends Manager {
     // constants
     private readonly _betId: string = "BetText";
@@ -28,7 +28,6 @@ export default class ViewGame extends Manager {
     private readonly _panelSize: number = 120;
     private readonly _VersusSize: number = 256;
     private readonly _VersusSpeed: number = 0.9;
-    private readonly _portWinExtraScaleFactor: number = 0.75;
 
     // private members
     private readonly _machineWidth: number;
@@ -207,9 +206,8 @@ export default class ViewGame extends Manager {
         const wVis: boolean = this.GetRenderable(this._winningsText);
         this.SetRenderable(this._winningsText, true);
 
-        const wScale = portrait ? this._portWinExtraScaleFactor : 1;
         offset = (this._panelSize - this._winningsTextHeight) / 2;
-        xywh = Manager.AnchorObjectLeftBottom(canvasHeight, this._winningsTextWidth * wScale, this._winningsTextHeight * wScale, scale, 0, -offset); 
+        xywh = Manager.AnchorObjectLeftBottom(canvasHeight, this._winningsTextWidth, this._winningsTextHeight, scale, 0, -offset); 
         this._winningsText.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
         this.SetRenderable(this._winningsText, wVis);
 

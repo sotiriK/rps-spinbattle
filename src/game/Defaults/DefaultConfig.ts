@@ -10,10 +10,11 @@ export default class DefaultConfig implements IConfig {
     public readonly MaxFps: number = 60;
     public readonly ReferenceWidth: number = 1920;
     public readonly ReferenceHeight: number = 1080;
-    public readonly MinWidthLandscape: number = 640;
-    public readonly MinHeightLandscape: number = 480;
-    public readonly MinWidthPortrait: number = 480;
-    public readonly MinHeightPortrait: number = 640;
+    public readonly MinWidthLandscape: number = 320;
+    public readonly MinHeightLandscape: number = 240;
+    public readonly MinWidthPortrait: number = 240;
+    public readonly MinHeightPortrait: number = 320;
+    public readonly PortraitScaleFactor: number = 0.75;
     public readonly BalanceStart: number = 10000;
     public readonly BetMin: number = 5;
     public readonly BetMax: number = 1000;
@@ -159,5 +160,4 @@ export default class DefaultConfig implements IConfig {
         - Etc...
     - Bet multiplier resets on each spin
     - Have fun and good luck!`;
-    public readonly GameCheat: string = `Next Stops:`;
 }

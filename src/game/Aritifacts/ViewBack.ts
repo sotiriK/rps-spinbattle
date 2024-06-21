@@ -13,13 +13,14 @@ export default class ViewBack extends Manager {
 
     // private members
     private _tileContainer?: IGoContainer;
-    private _flashFrames: number = 0;
+    private _flashFrames: number;
 
     // initialization
     public constructor(config: IConfig, renderer: IRenderer) {
         super(config, renderer);
         this._tileContainer = renderer.StageSpriteRepeat(this.Config.SpriteBackTile, this.Config.SpriteBackTile, this.Config.ReferenceWidth, this.Config.ReferenceHeight);
         this._tileContainer.alpha = this._alpha;
+        this._flashFrames = 0;
     }
 
     // abstract implementations

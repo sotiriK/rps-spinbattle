@@ -7,7 +7,7 @@ import IGoContainer from "../Interfaces/IGoContainer";
 import GoText from "./GoText";
 import GoPanel from "./GoPanel";
 
-// display menu graphics
+// display info page graphics
 export default class ViewInfo extends Manager {
     // constants
     private readonly _closeId: string = "ViewInfoExitButton";
@@ -32,7 +32,7 @@ export default class ViewInfo extends Manager {
     private readonly _coverColor: number = 0xdddddd;
     private readonly _coverAlpha: number = 0.95;
     private readonly _panelSize: number = 640;
-    private readonly _portraitFactor: number = 0.7;
+    private readonly _portraitDescFactor: number = 0.7;
     private readonly _stopsTextFactor: number = 0.7;
 
     // private members
@@ -87,7 +87,7 @@ export default class ViewInfo extends Manager {
         for (let index = 0; index < this._reelset.length; index++) {
             const reelString: string = this.GetReelString(this._reelset[index], index, 0);
             this._stops.push(0);
-            const text: IGoContainer = this.Renderer.StageText(`${this._reelId}_${index}`, reelString, this.Config.DescTextFonts, this.Config.DescTextSize, this.Config.DescTextColor, this.Config.DescTextStrokeColor, this.Config.DescTextStrokeSize, false);
+            const text: IGoContainer = this.Renderer.StageText(this.GetReelId(index), reelString, this.Config.DescTextFonts, this.Config.DescTextSize, this.Config.DescTextColor, this.Config.DescTextStrokeColor, this.Config.DescTextStrokeSize, false);
             this._reels.push(text);
         };
         this._reelTextWidth = this._reels[0].width;
@@ -98,7 +98,7 @@ export default class ViewInfo extends Manager {
         this._selectedReel = 0;
 
         // stops text
-        this._stopsText = new GoText(this.Renderer, this._nextStopsId, `${this._nextStopsInfo}${this._stops}`, this.Config.DescTextFonts, this.Config.DescTextSize * this._stopsTextFactor, this.Config.DescTextColor, this.Config.DescTextStrokeColor, this.Config.DescTextStrokeSize);
+        this._stopsText = new GoText(this.Renderer, this._nextStopsId, this.GetStopsText(), this.Config.DescTextFonts, this.Config.DescTextSize * this._stopsTextFactor, this.Config.DescTextColor, this.Config.DescTextStrokeColor, this.Config.DescTextStrokeSize);
         this._stopsTextWidth = this._stopsText.TextWidth;
         this._stopsTextHeight = this._stopsText.TextHeight;
 
@@ -184,7 +184,7 @@ export default class ViewInfo extends Manager {
         this._randButton.Dispose();
 
         for (let i: number = 0; i < this._reels.length; i++) { 
-            this.Renderer.Remove(`${this._reelId}_${i}`); 
+            this.Renderer.Remove(this.GetReelId(i)); 
         }
         this.Renderer.Remove(this._logoId);
         this.Renderer.Remove(this._coverId);
@@ -198,6 +198,7 @@ export default class ViewInfo extends Manager {
         let xywh = Manager.AnchorObjectRightBottom(canvasWidth, canvasHeight, this._exitSize, this._exitSize, scale, -this._edgeOffset, -this._edgeOffset);
         this._exitButton.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
 
+        let stopsTextY;
         if (!portrait) {
             // logo
             xywh = Manager.AnchorObjectLeftTop(this._logoSize, this._logoSize, scale, this._edgeOffset, (this._descTextHeight-this._logoSize)/2);
@@ -213,10 +214,11 @@ export default class ViewInfo extends Manager {
             // next stops text
             xywh = Manager.AnchorObjectLeftBottom(canvasHeight, this._stopsTextWidth, this._stopsTextHeight, scale, this._edgeOffset, -this._edgeOffset);
             this._stopsText.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
+            stopsTextY = xywh[1];
         }
         else {
             // logo
-            const ls = this._logoSize * this._portraitFactor;
+            const ls = this._logoSize;
             xywh = Manager.AnchorObjectCenterTop(canvasWidth, ls, ls, scale, 0, this._edgeOffset);
             this._logo.width = xywh[2];
             this._logo.height = xywh[3];
@@ -224,19 +226,20 @@ export default class ViewInfo extends Manager {
             this._logo.y = xywh[1];
 
             // description
-            const h = this._descTextHeight * this._portraitFactor;
-            const w = this._descTextWidth * this._portraitFactor;
+            const h = this._descTextHeight * this._portraitDescFactor;
+            const w = this._descTextWidth * this._portraitDescFactor;
             xywh = Manager.AnchorObjectCenterTop(canvasWidth, w, h, scale, 0, ls + this._edgeOffset + this._edgeOffset);
             this._descText.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
 
             // next stops text
             xywh = Manager.AnchorObjectLeftBottom(canvasHeight, this._stopsTextWidth, this._stopsTextHeight, scale, this._edgeOffset, -this._edgeOffset);
             this._stopsText.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
+            stopsTextY = xywh[1];
         }
 
         // selection buttons
         const s = this._navSize * scale;
-        const y = xywh[1] - s;
+        const y = stopsTextY - s;
         this._prevButton.Transform(xywh[0], y, s, s);
         this._upButton.Transform(xywh[0] + s, y, s, s);
         this._downButton.Transform(xywh[0] + s * 2, y, s, s);
@@ -267,6 +270,15 @@ export default class ViewInfo extends Manager {
         this._cover.height = canvasHeight;
     }
 
+    // helpers
+    private GetReelId(index: number): string {
+        return `${this._reelId}_${index}`;
+    }
+
+    private GetStopsText(): string {
+        return `${this._nextStopsInfo}${this._stops}`;
+    }
+
     private MoveStop(sign: number) {
         const reel = this._reelset[this._selectedReel];
         
@@ -279,8 +291,8 @@ export default class ViewInfo extends Manager {
         const reelString: string = this.GetReelString(reel, this._selectedReel, stop);
         
         this._stops[this._selectedReel] = stop;
-        this.Renderer.UpdateText(`${this._reelId}_${this._selectedReel}`, reelString);
-        this.Renderer.UpdateText(this._nextStopsId, `${this._nextStopsInfo}${this._stops}`);
+        this.Renderer.UpdateText(this.GetReelId(this._selectedReel), reelString);
+        this.Renderer.UpdateText(this._nextStopsId, this.GetStopsText());
     }
 
     private ZeroAllStops() {
@@ -288,8 +300,8 @@ export default class ViewInfo extends Manager {
             const reelString = this.GetReelString(reel, index, 0);
 
             this._stops[index] = 0;
-            this.Renderer.UpdateText(`${this._reelId}_${index}`, reelString);
-            this.Renderer.UpdateText(this._nextStopsId, `${this._nextStopsInfo}${this._stops}`);
+            this.Renderer.UpdateText(this.GetReelId(index), reelString);
+            this.Renderer.UpdateText(this._nextStopsId, this.GetStopsText());
         });
     }
 
@@ -299,8 +311,8 @@ export default class ViewInfo extends Manager {
             const reelString: string = this.GetReelString(reel, index, stop);
 
             this._stops[index] = stop;
-            this.Renderer.UpdateText(`${this._reelId}_${index}`, reelString);
-            this.Renderer.UpdateText(this._nextStopsId, `${this._nextStopsInfo}${this._stops}`);
+            this.Renderer.UpdateText(this.GetReelId(index), reelString);
+            this.Renderer.UpdateText(this._nextStopsId, this.GetStopsText());
         });
     }
 

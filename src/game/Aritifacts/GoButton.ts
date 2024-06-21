@@ -9,8 +9,8 @@ export default class GoButton extends GameObject {
 
     // private members 
     private _pressed: number = 0;
-    private _pressedHandler?: () => void;
     private _transform?: [x: number, y: number, w: number, h:number];
+    private _pressedHandler?: () => void;
 
     // initialization
     public constructor(renderer: IRenderer, id: string, asset: string, pressHandler: () => void) {

@@ -4,7 +4,7 @@ import IRenderer from "../Interfaces/IRenderer";
 import CompReel from "./CompReel";
 import GoWinBox from "./GoWinBox";
 
-// display the slot machine
+// display a slot machine
 export default class CompSlot extends Component {
     // constants
     private readonly _borderId: string = "Border";
@@ -65,14 +65,14 @@ export default class CompSlot extends Component {
         for (let i = 0; i < reelData.length; i++) {
             const width = this._symbolSize;
             const height = this._machineHeight;
-            const reelId = `${this._id}${this._reelId}${i}`;
+            const reelId = this.GetReelId(i);
             const reel = new CompReel(this.Renderer, reelId, reelData[i], symbolsData, this._stops[i], width, height);
             this._reels.push(reel);
         }
 
         // frame
-        this._cover = this.Renderer.StageRectangle(this._id + this._coverId, this._machineWidth, this._machineHeight, this._colorCover, this._alphaCover);
-        this._border = this.Renderer.StageFrame(this._id + this._borderId, this._machineWidth, this._machineHeight, this._borderWidth, this._colorBorder, this._alphaBorder);
+        this._cover = this.Renderer.StageRectangle(this.GetCCoverId(), this._machineWidth, this._machineHeight, this._colorCover, this._alphaCover);
+        this._border = this.Renderer.StageFrame(this.GetBorderId(), this._machineWidth, this._machineHeight, this._borderWidth, this._colorBorder, this._alphaBorder);
     }
     
     // abstract implementations
@@ -111,8 +111,8 @@ export default class CompSlot extends Component {
 
     public Dispose(): void {
         this.Renderer.Remove(this._id);
-        this.Renderer.Remove(this._id + this._coverId);
-        this.Renderer.Remove(this._id + this._borderId);
+        this.Renderer.Remove(this.GetCCoverId());
+        this.Renderer.Remove(this.GetBorderId());
         this._winBoxes.forEach((box) => { box.Dispose(); });
         this._winBoxes.length = 0;
         this._reels.forEach(reel => { reel.Dispose(); });
@@ -144,6 +144,18 @@ export default class CompSlot extends Component {
     }
 
     // helpers
+    private GetReelId(index: number): string {
+        return `${this._id}${this._reelId}${index}`;
+   }
+
+    private GetBorderId(): string {
+        return this._id + this._borderId;
+    }
+
+    private GetCCoverId(): string {
+        return this._id + this._coverId;
+    }
+
     private EndReelSpin(reel: number, stop: number, callbackPerReel: (reel: number) => void) {
         if (reel >= this._reels.length) return;
         this._reels[reel].EndSpin(stop, () => {
