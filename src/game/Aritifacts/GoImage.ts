@@ -37,7 +37,7 @@ export default class GoImage extends GameObject {
     // abstract implementations
     public Update(deltaTime: number): void {
         if (!this._container) return;
-        if (this._container.alpha === 0) return;
+        if (!this._container.visible) return;
 
         this._container.width = this._orgWidth * this._factor;
         this._container.height = this._orgHeight * this._factor;
@@ -57,6 +57,9 @@ export default class GoImage extends GameObject {
         if (this._hide) {
             const alpha = this._container.alpha - this._fade * deltaTime;
             this._container.alpha = alpha > 0 ? alpha : 0;
+            if (this._container.alpha === 0) {
+                this._container.visible = false;
+            }
         }
     }
 
@@ -71,5 +74,12 @@ export default class GoImage extends GameObject {
 
     public Hide(): void {
         this._hide = true;
+    }
+
+    public Show(): void {
+        this._hide = false;
+        if (!this._container) return;
+        this._container.alpha = 1;
+        this._container.visible = true;
     }
 }

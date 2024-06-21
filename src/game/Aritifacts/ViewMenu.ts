@@ -46,8 +46,10 @@ export default class ViewMenu extends Manager {
     }
 
     public UpdateLayout(scaleX: number, scaleY: number, canvasWidth: number, canvasHeight: number, portrait: boolean): void {
-        const scale = portrait ? scaleY : scaleX;
-        let xywh = Manager.AnchorObjectCenterMiddle(canvasWidth, canvasHeight, this._buttonWidth, this._buttonHeight, scale, 0, this._buttonOffsetY);
+        const scale: number = portrait ? scaleY : scaleX;
+        let xywh: [x: number, y: number, w: number, h: number];
+        
+        xywh = Manager.AnchorObjectCenterMiddle(canvasWidth, canvasHeight, this._buttonWidth, this._buttonHeight, scale, 0, this._buttonOffsetY);
         this._playButton.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
         
         xywh = Manager.AnchorObjectCenterMiddle(canvasWidth, canvasHeight, this._titleSize, this._titleSize, scale, 0, this._titleOffsetY);

@@ -129,7 +129,7 @@ export default class DefaultConfig implements IConfig {
     public readonly InitialHouseStops: Array<number> = [8, 10, 12, 23, 15];
 
     // no Paylines, for each win above WinMatchMin bet multiplier increases by BetMultiplierIncrease
-    // for example 3 matches = BetMultiplier, 4 matches = BetMultiplier + BetMultiplierInc, etc.
+    // for example 4 matches = BetMultiplier, 5 matches = BetMultiplier + BetMultiplierInc, etc.
     public readonly WinMatchMin: number = 4;
     public readonly BetMultiplier = 2;
     public readonly BetMultiplierInc = 2;

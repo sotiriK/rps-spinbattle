@@ -99,8 +99,8 @@ export default class PIXIRenderer implements IRenderer {
     }
 
     public StageText(id: string, text: string, fonts: Array<string>, size: number, color: number, strokeColor: number, strokeSize: number, bold: boolean): IGoContainer {
-        const weight = bold ? 'bold' : 'normal';
-        const style = new PIXI.TextStyle({
+        const weight: PIXI.TextStyleFontWeight = bold ? 'bold' : 'normal';
+        const style: PIXI.TextStyle = new PIXI.TextStyle({
             fontFamily: fonts, fontSize: size, fill: color, fontWeight: weight, stroke: {
                 width: strokeSize, color: strokeColor
             }
@@ -114,7 +114,7 @@ export default class PIXIRenderer implements IRenderer {
     }
 
     public StageMask(id: string, x: number, y:number, width: number, height:number): IGoContainer {
-        const child = new PIXI.Container();
+        const child: PIXI.Container = new PIXI.Container();
         child.x = x;
         child.y = y;
         child.width = width;
@@ -153,12 +153,12 @@ export default class PIXIRenderer implements IRenderer {
     }
 
     public RestageSpriteRepeat(id: string, width: number, height: number, scaleTile: number): IGoContainer {
-        const pre = this._containers.get(id);
-        const zIndex = pre ? pre.zIndex : this.GetIndex();
+        const pre: PIXI.Container | undefined = this._containers.get(id);
+        const zIndex: number = pre ? pre.zIndex : this.GetIndex();
         this.Remove(id);
 
         const texture: PIXI.Texture = PIXI.Texture.from(id);
-        const sprite = new PIXI.TilingSprite({texture, width: width, height: height, tileScale: {x: scaleTile, y: scaleTile}});
+        const sprite: PIXI.TilingSprite = new PIXI.TilingSprite({texture, width: width, height: height, tileScale: {x: scaleTile, y: scaleTile}});
         const container: PIXI.Container = this._application.stage.addChild(sprite);
         
         container.zIndex = zIndex;

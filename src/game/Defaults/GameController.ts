@@ -82,10 +82,10 @@ export default class GameController implements IGameController {
             sFactor = 1.0;
         }
 
-        const cwidth = wwidth < minW ? minW : wwidth;
-        const cheight = wheight < minH ? minH : wheight;
-        const scaleX = (cwidth / this.Config.ReferenceWidth) * sFactor;
-        const scaleY = (cheight / this.Config.ReferenceHeight) * sFactor;
+        const cwidth: number = wwidth < minW ? minW : wwidth;
+        const cheight: number = wheight < minH ? minH : wheight;
+        const scaleX: number = (cwidth / this.Config.ReferenceWidth) * sFactor;
+        const scaleY: number = (cheight / this.Config.ReferenceHeight) * sFactor;
 
         const objs: Array<Manager | undefined> = [this._background, this._menuView, this._slotView, this._infoView];
         for (const obj of objs) {
@@ -162,8 +162,8 @@ export default class GameController implements IGameController {
             if (!this._slotView) return; 
             
             this.Logger.log(`Generated stops: ${stops}`);
-            const playerStops = stops.splice(0, this.Config.Reelset.length);
-            const houseStops = stops;
+            const playerStops: Array<number> = stops.splice(0, this.Config.Reelset.length);
+            const houseStops: Array<number> = stops;
             this._slotView.EndSpin(playerStops, stops, (reel) => this.SpinReelComplete.call(this, reel), () => this.SpinComplete.call(this, playerStops, houseStops));
         }).catch((error) => {
             this.Logger.error(`Failed to generate stops: ${error}`);
@@ -218,12 +218,12 @@ export default class GameController implements IGameController {
 
     private BetChange(direction: number): [bet: number, balance: number] {
         if (direction > 0) {
-            const newBet = this._betAmount + this.Config.BetIncrement;
-            const newBalance = this.Engine.GetUserBalance() - newBet;
+            const newBet: number = this._betAmount + this.Config.BetIncrement;
+            const newBalance: number = this.Engine.GetUserBalance() - newBet;
             if (newBet <= this.Config.BetMax && newBalance >= 0) { this._betAmount = newBet; }
         } 
         else {
-            const newBet = this._betAmount - this.Config.BetIncrement;
+            const newBet: number = this._betAmount - this.Config.BetIncrement;
             if (newBet >= this.Config.BetMin) { this._betAmount = newBet; }
         }
         this.Audio.Play(this.Config.AudioClick);

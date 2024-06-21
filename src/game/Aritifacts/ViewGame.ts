@@ -7,6 +7,7 @@ import CompSlot from "./CompSlot";
 import GoPanel from "./GoPanel";
 import GoImage from "./GoImage";
 import Manager from "../Abstracts/Manager";
+import { off } from "process";
 
 // display slot game graphics
 export default class ViewGame extends Manager {
@@ -22,9 +23,8 @@ export default class ViewGame extends Manager {
     private readonly _footerId: string = "SlotFooter";
     private readonly _machineOffsetPortrait: number = 16;
     private readonly _machineOffsetLandscape: number = 48;
+    private readonly _buttonSize: number = 96;
     private readonly _spinButtonWidth: number = 384;
-    private readonly _spinButtonHeight: number = 96;
-    private readonly _otherButtonSize: number = 96;
     private readonly _panelSize: number = 120;
     private readonly _VersusSize: number = 256;
     private readonly _VersusSpeed: number = 0.9;
@@ -53,6 +53,7 @@ export default class ViewGame extends Manager {
     private readonly _minusButton: GameObject;
     private readonly _header: GameObject;
     private readonly _footer: GameObject; 
+    private _portrait: boolean;  
     private _gameOver: boolean;  
     private _spinCallback?: () => void;
 
@@ -64,7 +65,8 @@ export default class ViewGame extends Manager {
     // initialization
     public constructor(config: IConfig, renderer: IRenderer, spinHandler: () => void, exitHandler: () => void, infoHandler: () => void, betHandler: (direction: number) => [bet: number, balance: number]) {
         super(config, renderer);
-        this._spinCallback = undefined; 
+        this._spinCallback = undefined;
+        this._portrait = false;
         this._gameOver = false; 
         
         // slot machines
@@ -136,9 +138,8 @@ export default class ViewGame extends Manager {
         if (this._winningsText.GoContainer) {
             this._winningsText.GoContainer.renderable = winnings > 0;
         }
-        if (this._balanceText.GoContainer && this._exitButton.GoContainer) {
-            this._balanceText.GoContainer.x = this._exitButton.GoContainer.x - this._balanceText.GoContainer.width;
-        }
+        
+        this.PositionBalanceText();
         if (balance <= 0 && bet <= 0) {
             this._spinButton.Disabled = true;
             this._plusButton.Disabled = true;
@@ -166,68 +167,103 @@ export default class ViewGame extends Manager {
     }
 
     public UpdateLayout(scaleX: number, scaleY: number, canvasWidth: number, canvasHeight: number, portrait: boolean): void {
-        const scale = portrait ? scaleY : scaleX;
+        const scale: number = portrait ? scaleY : scaleX;
 
-        // spin button
-        let offset = (this._panelSize - this._spinButtonHeight) / 2;
-        let xywh = Manager.AnchorObjectCenterBottom(canvasWidth, canvasHeight, this._spinButtonWidth, this._spinButtonHeight, scale, 0, -offset);
-        this._spinButton.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
+        let offset: number;
+        let xywh: [x: number, y:number, w:number, h:number];
+        this._portrait = portrait;
+
+        // info button
+        offset = (this._panelSize - this._buttonSize) / 2;
+        xywh = Manager.AnchorObjectRightBottom(canvasWidth, canvasHeight, this._buttonSize, this._buttonSize, scale, -offset, -offset);
+        this._infoButton.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
 
         // minus button 
-        xywh = Manager.AnchorObjectLeftTop(this._otherButtonSize, this._otherButtonSize, scale, offset, offset);
+        xywh = Manager.AnchorObjectLeftTop(this._buttonSize, this._buttonSize, scale, offset, offset);
         this._minusButton.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
 
         // plus button
-        let stackedoffset = offset + this._otherButtonSize + offset;
-        xywh = Manager.AnchorObjectLeftTop(this._otherButtonSize, this._otherButtonSize, scale, stackedoffset, offset);
+        const playOffsetX: number = offset + this._buttonSize + offset;
+        xywh = Manager.AnchorObjectLeftTop(this._buttonSize, this._buttonSize, scale, playOffsetX, offset);
         this._plusButton.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
 
-        // info button
-        xywh = Manager.AnchorObjectRightBottom(canvasWidth, canvasHeight, this._otherButtonSize, this._otherButtonSize, scale, -offset, -offset);
-        this._infoButton.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
-
         // exit button
-        xywh = Manager.AnchorObjectRightTop(canvasWidth, this._otherButtonSize, this._otherButtonSize, scale, -offset, offset);
+        xywh = Manager.AnchorObjectRightTop(canvasWidth, this._buttonSize, this._buttonSize, scale, -offset, offset);
         this._exitButton.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
         const exitButtonX = xywh[0];
+        const exitButtonOffset = offset;
 
-        // balance text
-        offset = (this._panelSize - this._balanceTextHeight) / 2;
-        xywh = Manager.AnchorObjectRightTop(canvasWidth, this._balanceTextWidth, this._balanceTextHeight, scale, 0, offset);
-        this._balanceText.Transform(exitButtonX-xywh[2], xywh[1], xywh[2], xywh[3]);
-
-        // bet text
-        stackedoffset = offset + this._otherButtonSize + offset + this._otherButtonSize + offset;
-        offset = (this._panelSize - this._betTextHeight) / 2;
-        xywh = Manager.AnchorObjectLeftTop(this._betTextWidth, this._betTextHeight, scale, stackedoffset, offset);
-        this._betText.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
-
-        // winnings text
-        const wVis: boolean = this.GetRenderable(this._winningsText);
-        this.SetRenderable(this._winningsText, true);
-
-        offset = (this._panelSize - this._winningsTextHeight) / 2;
-        xywh = Manager.AnchorObjectLeftBottom(canvasHeight, this._winningsTextWidth, this._winningsTextHeight, scale, 0, -offset); 
-        this._winningsText.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
-        this.SetRenderable(this._winningsText, wVis);
-
-        // panels
-        const panelSizeScaled = this._panelSize * scale;
-        this._header.Transform(0, 0, canvasWidth, panelSizeScaled);
-        this._footer.Transform(0, canvasHeight - panelSizeScaled, canvasWidth, panelSizeScaled);
-
-        // slot machines
+        // slot machines, spin button, panels, and text
         const w: number = this._machineWidth;
         const h: number = this._machineHeight;
         let xywhPlayer: [x: number, y:number, w:number, h:number];
         let xywhHouse: [x: number, y:number, w:number, h:number];
 
         if (portrait) {
+            // spin button
+            xywh = Manager.AnchorObjectLeftBottom(canvasHeight, this._spinButtonWidth, this._buttonSize, scale, offset, -offset);
+            this._spinButton.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
+
+            // panels
+            const portraitPanelSize: number = (this._panelSize + this._balanceTextHeight + exitButtonOffset);
+            const panelSizeScaled: number = portraitPanelSize * scale;
+            this._header.Transform(0, 0, canvasWidth, panelSizeScaled);
+            this._footer.Transform(0, canvasHeight - panelSizeScaled, canvasWidth, panelSizeScaled);
+
+            // balance text
+            offset = this._panelSize;
+            xywh = Manager.AnchorObjectRightTop(canvasWidth, this._balanceTextWidth, this._balanceTextHeight, scale, -exitButtonOffset, offset);
+            this._balanceText.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
+
+            // bet text
+            xywh = Manager.AnchorObjectLeftTop(this._betTextWidth, this._betTextHeight, scale, exitButtonOffset, offset);
+            this._betText.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
+
+            // winnings text
+            const wVis: boolean = this.GetRenderable(this._winningsText);
+            this.SetRenderable(this._winningsText, true);
+
+            xywh = Manager.AnchorObjectLeftBottom(canvasHeight, this._winningsTextWidth, this._winningsTextHeight, scale, 0, -offset); 
+            this._winningsText.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
+            this.SetRenderable(this._winningsText, wVis);
+            
+            // slot machines
             offset = h / 2 + this._machineOffsetPortrait;
             xywhPlayer = Manager.AnchorObjectCenterMiddle(canvasWidth, canvasHeight, w, h, scale, 0, -offset);
             xywhHouse = Manager.AnchorObjectCenterMiddle(canvasWidth, canvasHeight, w, h, scale, 0, offset);
         }
         else {
+            // spin button
+            offset = (this._panelSize - this._buttonSize) / 2;
+            xywh = Manager.AnchorObjectCenterBottom(canvasWidth, canvasHeight, this._spinButtonWidth, this._buttonSize, scale, 0, -offset);
+            this._spinButton.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
+
+            // panels
+            const panelSizeScaled: number = this._panelSize * scale;
+            this._header.Transform(0, 0, canvasWidth, panelSizeScaled);
+            this._footer.Transform(0, canvasHeight - panelSizeScaled, canvasWidth, panelSizeScaled);
+
+            // balance text
+            offset = (this._panelSize - this._balanceTextHeight) / 2;
+            xywh = Manager.AnchorObjectRightTop(canvasWidth, this._balanceTextWidth, this._balanceTextHeight, scale, 0, offset);
+            this._balanceText.Transform(exitButtonX-xywh[2], xywh[1], xywh[2], xywh[3]);
+
+            // bet text
+            const betOffsetX = offset + this._buttonSize + offset + this._buttonSize;
+            offset = (this._panelSize - this._betTextHeight) / 2;
+            xywh = Manager.AnchorObjectLeftTop(this._betTextWidth, this._betTextHeight, scale, betOffsetX, offset);
+            this._betText.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
+
+            // winnings text
+            const wVis: boolean = this.GetRenderable(this._winningsText);
+            this.SetRenderable(this._winningsText, true);
+
+            offset = (this._panelSize - this._winningsTextHeight) / 2;
+            xywh = Manager.AnchorObjectLeftBottom(canvasHeight, this._winningsTextWidth, this._winningsTextHeight, scale, 0, -offset); 
+            this._winningsText.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
+            this.SetRenderable(this._winningsText, wVis);
+
+            // slot machines
             offset = w / 2 + this._machineOffsetLandscape;
             xywhPlayer = Manager.AnchorObjectCenterMiddle(canvasWidth, canvasHeight, w, h, scale, -offset, 0);
             xywhHouse = Manager.AnchorObjectCenterMiddle(canvasWidth, canvasHeight, w, h, scale, offset, 0);
@@ -253,7 +289,7 @@ export default class ViewGame extends Manager {
 
         // images
         xywh = Manager.AnchorObjectCenterMiddle(canvasWidth, canvasHeight, this._VersusSize, this._VersusSize, scale, 0, 0);
-        this._versus.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);       
+        this._versus.Transform(xywh[0], xywh[1], xywh[2], xywh[3]); 
     }
     
     public Update(deltaTime: number): void {
@@ -303,12 +339,19 @@ export default class ViewGame extends Manager {
         const newBetBalance: [bet: number, balance: number] = handler(direction);
         this._betText.Text = this.GetBetText(newBetBalance[0]);
         this._balanceText.Text = this.GetBalanceText(newBetBalance[1]);
-        if (this._balanceText.GoContainer && this._exitButton.GoContainer) {
+        this.PositionBalanceText();
+    }
+
+    // helpers
+    private PositionBalanceText(): void {
+        if (!this._balanceText.GoContainer || !this._exitButton.GoContainer) return;
+        if (this._portrait) {
+            this._balanceText.GoContainer.x = this._exitButton.GoContainer.x + this._exitButton.GoContainer.width - this._balanceText.GoContainer.width;   
+        } else {
             this._balanceText.GoContainer.x = this._exitButton.GoContainer.x - this._balanceText.GoContainer.width;
         }
     }
 
-    // helpers
     private FormatFunds(value: number): string {
         return Math.floor(value).toLocaleString();
     }
@@ -327,10 +370,10 @@ export default class ViewGame extends Manager {
     }
 
     private GetBetText(value: number): string {
-        return `${this.Config.TextBet}${this.FormatFunds(value)}  `;
+        return ` ${this.Config.TextBet}${this.FormatFunds(value)}  `;
     }
 
     private GetWinningsText(value: number): string {
-        return `${this.Config.TextWinnings}${this.FormatFunds(value)} `;
+        return ` ${this.Config.TextWinnings}${this.FormatFunds(value)}  `;
     }
 }

@@ -192,13 +192,15 @@ export default class ViewInfo extends Manager {
     }
 
     public UpdateLayout(scaleX: number, scaleY: number, canvasWidth: number, canvasHeight: number, portrait: boolean): void {
-        const scale = portrait ? scaleY : scaleX;
+        const scale: number = portrait ? scaleY : scaleX;
+        
+        let xywh: [x: number, y: number, w: number, h: number];
+        let stopsTextY: number;
 
         // exit button
-        let xywh = Manager.AnchorObjectRightBottom(canvasWidth, canvasHeight, this._exitSize, this._exitSize, scale, -this._edgeOffset, -this._edgeOffset);
+        xywh = Manager.AnchorObjectRightBottom(canvasWidth, canvasHeight, this._exitSize, this._exitSize, scale, -this._edgeOffset, -this._edgeOffset);
         this._exitButton.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
 
-        let stopsTextY;
         if (!portrait) {
             // logo
             xywh = Manager.AnchorObjectLeftTop(this._logoSize, this._logoSize, scale, this._edgeOffset, (this._descTextHeight-this._logoSize)/2);
@@ -218,7 +220,7 @@ export default class ViewInfo extends Manager {
         }
         else {
             // logo
-            const ls = this._logoSize;
+            const ls: number = this._logoSize;
             xywh = Manager.AnchorObjectCenterTop(canvasWidth, ls, ls, scale, 0, this._edgeOffset);
             this._logo.width = xywh[2];
             this._logo.height = xywh[3];
@@ -226,8 +228,8 @@ export default class ViewInfo extends Manager {
             this._logo.y = xywh[1];
 
             // description
-            const h = this._descTextHeight * this._portraitDescFactor;
-            const w = this._descTextWidth * this._portraitDescFactor;
+            const h: number = this._descTextHeight * this._portraitDescFactor;
+            const w: number = this._descTextWidth * this._portraitDescFactor;
             xywh = Manager.AnchorObjectCenterTop(canvasWidth, w, h, scale, 0, ls + this._edgeOffset + this._edgeOffset);
             this._descText.Transform(xywh[0], xywh[1], xywh[2], xywh[3]);
 
@@ -238,8 +240,8 @@ export default class ViewInfo extends Manager {
         }
 
         // selection buttons
-        const s = this._navSize * scale;
-        const y = stopsTextY - s;
+        const s: number = this._navSize * scale;
+        const y: number = stopsTextY - s;
         this._prevButton.Transform(xywh[0], y, s, s);
         this._upButton.Transform(xywh[0] + s, y, s, s);
         this._downButton.Transform(xywh[0] + s * 2, y, s, s);
@@ -248,13 +250,13 @@ export default class ViewInfo extends Manager {
         this._randButton.Transform(xywh[0] + s * 5, y, s, s);
 
         // panel
-        const edgeOffsetScaled = this._edgeOffset * scale;
-        const b = this._descText.GoContainer!.y + this._descText.GoContainer!.height;
+        const edgeOffsetScaled: number = this._edgeOffset * scale;
+        const b: number = this._descText.GoContainer!.y + this._descText.GoContainer!.height;
         this._header.Transform(0, 0, canvasWidth, b + edgeOffsetScaled + edgeOffsetScaled);
 
         // reels
-        const reelsOffsetY = portrait ? edgeOffsetScaled + edgeOffsetScaled : 0;
-        this._reels.forEach((reel: IGoContainer, index: number) => {
+        const reelsOffsetY: number = portrait ? edgeOffsetScaled + edgeOffsetScaled : 0;
+        this._reels.forEach((reel, index) => {
             xywh = Manager.AnchorObjectCenterBottom(canvasWidth, canvasHeight, this._reelTextWidth, this._reelTextHeight, scale, 0, 0);
             reel.x = xywh[0] - (xywh[2] * this._reels.length) / 2 + xywh[2] * index + xywh[2] / 2;
             reel.y = this._header.GoContainer!.height + (canvasHeight - this._header.GoContainer!.height) / 2 - xywh[3] / 2 - reelsOffsetY;
@@ -280,7 +282,7 @@ export default class ViewInfo extends Manager {
     }
 
     private MoveStop(sign: number) {
-        const reel = this._reelset[this._selectedReel];
+        const reel: Array<string> = this._reelset[this._selectedReel];
         
         let inputStop: number = this._stops[this._selectedReel] + sign;
         if (inputStop < 0) {
@@ -296,8 +298,8 @@ export default class ViewInfo extends Manager {
     }
 
     private ZeroAllStops() {
-        this._reelset.forEach((reel: Array<string>, index) => {
-            const reelString = this.GetReelString(reel, index, 0);
+        this._reelset.forEach((reel, index) => {
+            const reelString: string = this.GetReelString(reel, index, 0);
 
             this._stops[index] = 0;
             this.Renderer.UpdateText(this.GetReelId(index), reelString);
@@ -306,7 +308,7 @@ export default class ViewInfo extends Manager {
     }
 
     private RandomAllStops() {
-        this._reelset.forEach((reel: Array<string>, index) => {
+        this._reelset.forEach((reel, index) => {
             const stop: number = Math.floor(Math.random() * reel.length);
             const reelString: string = this.GetReelString(reel, index, stop);
 
@@ -319,7 +321,7 @@ export default class ViewInfo extends Manager {
     private GetReelString(reel: Array<string>, reelIndex: number, stop: number): string {
         let text: string = reel[stop];
         for (let i = 1; i < this.Config.MachineRows; i++) { 
-            const next = (stop + i) % reel.length;
+            const next: number = (stop + i) % reel.length;
             text += `\n${reel[next]}`;
         }
         return `${reelIndex}\n-\n${text}`;
