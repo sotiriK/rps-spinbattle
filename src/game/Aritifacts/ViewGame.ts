@@ -7,7 +7,6 @@ import CompSlot from "./CompSlot";
 import GoPanel from "./GoPanel";
 import GoImage from "./GoImage";
 import Manager from "../Abstracts/Manager";
-import { off } from "process";
 
 // display slot game graphics
 export default class ViewGame extends Manager {
