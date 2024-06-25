@@ -160,11 +160,12 @@ export default class CompReel extends Component {
 
     private MoveSymbols(change: number, symSize: number): void {
         const edgeBottom = this._maskHeight + symSize * this._visibleSymbols;
-        const minPosY = this.GetSymbolsMinY();
+        let minPosY = this.GetSymbolsMinY();
         this._symbols.forEach((container) => { 
             container.y += change; 
             if (container.y > edgeBottom) {
-                container.y = minPosY - symSize + change;
+                minPosY -= symSize;
+                container.y = minPosY + change;
             }
         });
     }
