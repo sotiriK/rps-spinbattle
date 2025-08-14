@@ -1,6 +1,6 @@
 {
   "short_name": "RPS",
-  "name": "Create React App Sample",
+  "name": "RPS Spin Battle",
   "icons": [
   ],
   "start_url": ".",
