@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/rps-spinbattle/static/css/main.6063c591.css",
+    "main.js": "/rps-spinbattle/static/js/main.49862a4e.js",
+    "static/js/372.73d56d18.chunk.js": "/rps-spinbattle/static/js/372.73d56d18.chunk.js",
+    "static/js/929.85e46c61.chunk.js": "/rps-spinbattle/static/js/929.85e46c61.chunk.js",
+    "static/js/258.01213f59.chunk.js": "/rps-spinbattle/static/js/258.01213f59.chunk.js",
+    "static/js/627.122f2c6c.chunk.js": "/rps-spinbattle/static/js/627.122f2c6c.chunk.js",
+    "static/js/83.e86d40de.chunk.js": "/rps-spinbattle/static/js/83.e86d40de.chunk.js",
+    "static/js/298.1d98bf52.chunk.js": "/rps-spinbattle/static/js/298.1d98bf52.chunk.js",
+    "static/js/90.76be0158.chunk.js": "/rps-spinbattle/static/js/90.76be0158.chunk.js",
+    "index.html": "/rps-spinbattle/index.html",
+    "main.6063c591.css.map": "/rps-spinbattle/static/css/main.6063c591.css.map",
+    "main.49862a4e.js.map": "/rps-spinbattle/static/js/main.49862a4e.js.map",
+    "372.73d56d18.chunk.js.map": "/rps-spinbattle/static/js/372.73d56d18.chunk.js.map",
+    "258.01213f59.chunk.js.map": "/rps-spinbattle/static/js/258.01213f59.chunk.js.map",
+    "627.122f2c6c.chunk.js.map": "/rps-spinbattle/static/js/627.122f2c6c.chunk.js.map",
+    "83.e86d40de.chunk.js.map": "/rps-spinbattle/static/js/83.e86d40de.chunk.js.map",
+    "298.1d98bf52.chunk.js.map": "/rps-spinbattle/static/js/298.1d98bf52.chunk.js.map",
+    "90.76be0158.chunk.js.map": "/rps-spinbattle/static/js/90.76be0158.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6063c591.css",
+    "static/js/main.49862a4e.js"
+  ]
+}

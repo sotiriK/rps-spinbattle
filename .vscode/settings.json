@@ -1,0 +1,19 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/setupTests.ts": true,
+    "**/serviceWorker.ts": true,
+    "**/react-app-env.d.ts": true,
+    "**/yarn.lock": true
+  },
+  "explorerExclude.backup": null,
+  "cSpell.words": [
+    "Mahi",
+    "PIXI"
+  ]
+}
